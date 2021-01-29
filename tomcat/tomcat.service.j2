@@ -1,0 +1,21 @@
+[Unit]
+Description=Apache apache-tomcat-8.5.61 Web Application Container
+After=network.target
+
+[Service]
+Type=forking
+
+Environment=JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.272.b10-1.amzn2.0.1.x86_64/jre
+Environment=CATALINA_PID=/opt/apache-tomcat-8.5.61/temp/apache-tomcat-8.5.61.pid
+Environment=CATALINA_HOME=/opt/apache-tomcat-8.5.61
+Environment=CATALINA_BASE=/opt/apache-tomcat-8.5.61
+Environment='CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
+Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom'
+ExecStart=/opt/apache-tomcat-8.5.61/bin/startup.sh
+ExecStop=/bin/kill -15 $MAINPID
+
+User=tomcat
+Group=tomcat
+
+[Install]
+WantedBy=multi-user.target

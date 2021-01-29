@@ -1,0 +1,50 @@
+- hosts: test
+  tasks:
+  - name: Check Tomcat already exists or not
+    stat:
+      path: /opt/apache-tomcat-8.5.61.tar.gz
+    register: check_tomcat_existence
+  - name: Print variables
+    debug:
+      msg: check_tomcat_existence
+  - name: download tomcat url
+    get_url:
+      url: https://mirrors.estointernet.in/apache/tomcat/tomcat-8/v8.5.61/bin/apache-tomcat-8.5.61.tar.gz
+      dest: /opt
+      mode: 0777
+    when: not check_tomcat_existence.stat.exists
+  - name: extract tomcat
+    unarchive:
+      src: /opt/apache-tomcat-8.5.61.tar.gz
+      dest: /opt
+      remote_src: True
+  - name: Create Tomcat user and Group
+    user:
+      name: tomcat
+      state: present
+      comment: "user for comment"
+  - name: Change directory tomcat permissions
+    file:
+      path: /opt/apache-tomcat-8.5.61
+      state: directory
+      recurse: yes
+      owner: tomcat
+      group: tomcat
+      mode: '0755'
+  - name: tomcat service file template
+    template:
+      src: tomcat.service.j2
+      dest: ./tomcat.service
+  - name: Copy Tomcat service from local to remote
+    copy:
+      src: ./tomcat.service
+      dest: /etc/systemd/system/
+      mode: 0755
+      remote_src: yes
+  - name: just force systemd to reread configs (2.4 and above)
+    systemd:
+      daemon_reload: yes
+  - name: enable tomcat startup
+    service:
+      name: tomcat
+      state: restarted
