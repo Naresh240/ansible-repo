@@ -1,0 +1,46 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Install git
+      yum: name=git state=present
+    - name: Install java
+      yum:
+        name: java-1.8.0-openjdk-devel
+        state: present
+    - name: Check maven is there already or not
+      stat:
+        path: /opt/apache-maven-3.6.3-bin.tar.gz
+      register: maven_output
+    - name: print maven_output
+      debug:
+        msg: "{{ maven_output }}"
+    - name: Download apache maven
+      get_url:
+        url: https://mirrors.estointernet.in/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+        dest: /opt
+        mode: '0777'
+      when: not maven_output.stat.exists
+    - name: Extract Apache maven
+      unarchive:
+        src: /opt/apache-maven-3.6.3-bin.tar.gz
+        dest: /opt
+        remote_src: True
+    - name: Check jenkins rpm is already there or not
+      yum:
+        list: jenkins
+         # If not installed yum_list.results[*].yumstate != installed
+      register: yum_list
+
+    - name: Install jenkins from rpm only when it is not there
+      command: yum install http://mirrors.jenkins-ci.org/redhat/jenkins-2.273-1.1.noarch.rpm -y
+      when: yum_list.results | selectattr("yumstate", "match", "installed") | list | length == 0
+    - name: Start Jenkins
+      service:
+        name: jenkins
+        state: started
+    - name: Install docker
+      yum: name=docker state=present
+    - name: Start docker
+      service:
+        name: docker
+        state: started

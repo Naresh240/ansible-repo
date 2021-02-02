@@ -1,0 +1,27 @@
+---
+ - name: "Installing Maven on slave machines and setting Path(environment) variables"
+   hosts: localhost
+   gather_facts: false
+   become: yes
+   remote_user: root
+   tasks:
+     - name: Installing Maven on the slave nodes
+       get_url:
+         url: https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+         dest: /opt
+         mode: '0777'
+
+     - name: Extracting Tar file using Unarchive module
+       unarchive:
+         src: /opt/apache-maven-3.6.3-bin.tar.gz
+         dest: /opt
+
+     - name: Changing the folder name
+       command: mv /opt/apache-maven-3.6.3 /opt/maven
+
+     - name: Adding the path in the bashrc files
+       lineinfile: dest=/root/.bashrc line='export PATH=$PATH:/opt/maven/bin' insertafter='EOF' regexp='export PATH=\$PATH:/opt/maven/bin' state=present
+
+     - name: Source the bashrc file
+       shell: source /root/.bashrc
+       remote_user: root

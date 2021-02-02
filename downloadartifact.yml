@@ -1,0 +1,22 @@
+---
+- hosts: nexusserver
+  become: yes
+  tasks:
+  - name: Install PIP
+    yum:
+      name: python-pip
+      state: present
+  - name: Install lxml
+    pip:
+      name: lxml
+  - name: download artifacts
+    maven_artifact:
+      group_id: org.springframework
+      artifact_id: gs-spring-boot
+      repository_url: 'http://34.230.8.108:8081/repository/maven-releases/'
+      version: "{{ version }}"
+      username: admin
+      password: admin123
+      dest: /opt
+  - name: Run JAR File
+    shell: nohup java -jar /opt/gs-spring-boot-0.1.0.jar &

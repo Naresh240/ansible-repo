@@ -1,0 +1,11 @@
+---
+- hosts: nodes
+  tasks:
+    - name: Start Docker Container
+      docker_container:
+        name: springboohello
+        image: naresh240/springboohello:latest
+        state: started
+        recreate: yes
+        exposed_ports:
+          - 8080:8080
