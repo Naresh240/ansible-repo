@@ -1,7 +1,7 @@
 ---
- - hosts: localhost
+ - hosts: test
    vars:
-        tomcat_download_url: https://mirrors.estointernet.in/apache/tomcat/tomcat-9/v9.0.37/bin/apache-tomcat-9.0.37.tar.gz
+        tomcat_download_url: https://mirrors.estointernet.in/apache/tomcat/tomcat-9/v9.0.41/bin/apache-tomcat-9.0.41.tar.gz
         tomcat_download_directory: /opt
    tasks:
      - name: Check if java rpm is already installed or not
@@ -19,7 +19,7 @@
          msg: "{{ tomcat_download_url }}"
      - name: Check Tomcat already exists or not
        stat:
-         path: "{{ tomcat_download_directory }}/apache-tomcat-9.0.37.tar.gz"
+         path: "{{ tomcat_download_directory }}/apache-tomcat-9.0.41.tar.gz"
        register: check_tomcat_existence
 
      - name: Download Apache Tomcat 9
@@ -30,7 +30,7 @@
        when: not check_tomcat_existence.stat.exists
      - name: unarchive Apache tomcat
        unarchive:
-         src: "{{ tomcat_download_directory }}/apache-tomcat-9.0.37.tar.gz"
+         src: "{{ tomcat_download_directory }}/apache-tomcat-9.0.41.tar.gz"
          dest: "{{ tomcat_download_directory }}"
          remote_src: yes
      - name: Create Tomcat user and Group
@@ -39,7 +39,7 @@
          comment: user for tomcat
      - name: Change owner ship for tomcat
        file:
-         path: /opt/apache-tomcat-9.0.37
+         path: /opt/apache-tomcat-9.0.41
          state: directory
          recurse: yes
          owner: tomcat
@@ -54,6 +54,7 @@
          src: ./tomcat.service
          dest: /etc/systemd/system/
          mode: 0755
+         remote_src: yes
      - name: just force systemd to reread configs (2.4 and above)
        systemd:
          daemon_reload: yes
