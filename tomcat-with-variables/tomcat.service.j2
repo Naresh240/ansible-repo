@@ -1,0 +1,28 @@
+[Unit]
+Description=Apache Tomcat Web Application Container
+After=syslog.target network.target
+
+[Service]
+Type=forking
+
+Environment=JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.252.b09-2.amzn2.0.1.x86_64/jre
+Environment=CATALINA_PID={{ tomcat_download_directory }}/apache-tomcat-9.0.37/temp/tomcat.pid
+Environment=CATALINA_HOME={{ tomcat_download_directory }}/apache-tomcat-9.0.37
+Environment=CATALINA_BASE={{ tomcat_download_directory }}/apache-tomcat-9.0.37
+Environment='CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
+Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom'
+ExecStart="{{ tomcat_download_directory }}/apache-tomcat-9.0.37/bin/startup.sh"
+ExecStop=/bin/kill -15 $MAINPID
+
+User=tomcat
+Group=tomcat
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+  
+  
+
+	 
