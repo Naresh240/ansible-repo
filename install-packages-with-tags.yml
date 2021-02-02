@@ -1,0 +1,12 @@
+- hosts: test
+  tasks:
+  - name: install git
+    yum:
+      name: git
+      state: present
+    tags: install
+  - name: uninstall git
+    yum:
+      name: git
+      state: absent
+    tags: uninstall
