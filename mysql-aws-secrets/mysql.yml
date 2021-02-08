@@ -1,8 +1,10 @@
 ---
-- hosts: webservers
-  vars_files:
-    - mysql_pass.yml
+- hosts: localhost
   tasks:
+  - name: Install boto3 for Ansible Lookup Plugin to work
+    pip:
+      name: boto3
+    tags: create	  
   - name: Install mysql packages
     docker_container:
       name: mysql-container
@@ -14,12 +16,9 @@
       volumes:
         - /var/lib/mysql
       env:
-        MYSQL_ROOT_PASSWORD: "{{ db_password }}"
-        MYSQL_DATABASE: employeedb
-        MYSQL_USER: naresh
-        MYSQL_PASSWORD: "{{ db_password }}"
+        "MYSQL_ROOT_PASSWORD": "{{ lookup('aws_secret', 'dev/app/mysql') }}"
     tags: create
-  - name: Removing mysql packages
+  - name: Remove mysql packages
     docker_container:
       name: mysql-container
       image: mysql:5.7
@@ -30,8 +29,6 @@
       volumes:
         - /var/lib/mysql
       env:
-        MYSQL_ROOT_PASSWORD: "{{ db_password }}"
-        MYSQL_DATABASE: employeedb
-        MYSQL_USER: naresh
-        MYSQL_PASSWORD: "{{ db_password }}"
+        "MYSQL_ROOT_PASSWORD": "{{ lookup('aws_secret', 'dev/app/mysql') }}"
     tags: remove
+

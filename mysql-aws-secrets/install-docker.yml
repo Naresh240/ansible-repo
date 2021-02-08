@@ -1,0 +1,18 @@
+---
+- hosts: webservers
+  tasks:
+  - name: install python and pip
+    yum:
+      name: python-pip
+      state: present
+  - name: Install docker in node
+    yum:
+      name: docker
+      state: present
+  - name: Start serice docker
+    service:
+      name: docker
+      state: started
+  - name: install docker module
+    pip:
+      name: docker-py
