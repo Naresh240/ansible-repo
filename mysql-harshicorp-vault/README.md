@@ -5,11 +5,13 @@
 # Open port 8200 and check vault in UI
   http://34.229.137.177:8200/
   
-  Give 5 and 3 for creating account, will get keys... These keys will be useful for login.
+  Give 5 and 3 for creating account, will get keys... These keys will be useful for login and get as shown below
   
   ![image](https://user-images.githubusercontent.com/58024415/107338827-03923a00-6ae2-11eb-952f-ce4b0f560b96.png)
+  
+  
 # Create secret here for mysql root password
-  1. Click on "Enable New Engine"
+  Click on "Enable New Engine"
   
   ![image](https://user-images.githubusercontent.com/58024415/107339176-62f04a00-6ae2-11eb-90df-4d3a5ab82b83.png)
   
