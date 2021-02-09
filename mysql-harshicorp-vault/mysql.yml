@@ -1,0 +1,34 @@
+---
+- hosts: localhost
+  vars:
+    password_vault: "{{ lookup('hashi_vault', 'secret=/kv/secret/data token=s.4CUw3qxQmWEZAVHFyT3p3FIA url=http://34.229.137.177:8200 validate_certs=false') }}"
+  tasks:
+  - name: install hvac module
+    pip:
+      name: hvac
+  - name: Install mysql packages
+    docker_container:
+      name: mysql-container
+      image: mysql:5.7
+      state: started
+      recreate: yes
+      ports:
+        - 3306:3306
+      volumes:
+        - /var/lib/mysql
+      env:
+        "MYSQL_ROOT_PASSWORD": "{{ password_vault.password }}"
+    tags: create
+  - name: Remove mysql packages
+    docker_container:
+      name: mysql-container
+      image: mysql:5.7
+      state: absent
+      recreate: yes
+      ports:
+        - 3306:3306
+      volumes:
+        - /var/lib/mysql
+      env:
+        "MYSQL_ROOT_PASSWORD": "{{ password_vault.password }}"
+    tags: remove
