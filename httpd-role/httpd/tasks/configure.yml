@@ -1,0 +1,11 @@
+---
+- name: copy config file to /etc/httpd/conf
+  copy:
+    src: files/httpd.conf
+    dest: /etc/httpd/conf/httpd.conf
+- name: Copy html file to default path
+  copy:
+    src: files/index.html 
+    dest: /var/www/html
+  notify:
+  - restart httpd
