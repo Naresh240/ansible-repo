@@ -8,4 +8,4 @@
     yum:
       name: java-1.8.0-openjdk
       state: present
-    when: check_java_existance.results | selectattr("yumstate","match","list") | list | length == 0
+    when: check_java_existance.results | selectattr("yumstate","match","installed") | list | length == 0
