@@ -1,0 +1,18 @@
+---
+- hosts: webservers
+  tasks:
+  - name: Install mysql packages
+    docker_container:
+      name: mysql-container
+      image: mysql:5.7
+      state: "{{ container_state }}"
+      recreate: yes
+      ports:
+      - 3306:3306
+      volumes:
+      - /var/lib/mysql
+      env:
+        MYSQL_ROOT_PASSWORD: Naresh#240
+        MYSQL_DATABASE: employeedb
+        MYSQL_USER: naresh
+        MYSQL_PASSWORD: Naresh#240
