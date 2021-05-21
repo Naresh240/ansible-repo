@@ -8,7 +8,7 @@
       state: started
       recreate: yes
       ports:
-        - 3306:3306
+      - 3306:3306
       volumes:
         - /var/lib/mysql
       env:
@@ -24,7 +24,7 @@
       state: absent
       recreate: yes
       ports:
-        - 3306:3306
+      - 3306:3306
       volumes:
         - /var/lib/mysql
       env:
