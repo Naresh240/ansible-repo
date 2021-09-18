@@ -1,6 +1,6 @@
 - hosts: 107.21.194.229
   gather_facts: no
-  remote_user: ec2-user
+  become_user: root
   tasks:
   - name: check java installation
     yum:
