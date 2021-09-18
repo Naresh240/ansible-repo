@@ -1,0 +1,13 @@
+- hosts: test
+  gather_facts: no
+  remote_user:
+  tasks:
+  - name: check java installation
+    yum:
+      list: java-1.8.0-openjdk
+    register: check_java_existance
+  - name: Install java
+    yum:
+      name: java-1.8.0-openjdk
+      state: present
+    when: check_java_existance.results | selectattr("yumstate","match","installed") | list | length == 0
