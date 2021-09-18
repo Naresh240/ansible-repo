@@ -1,6 +1,6 @@
 - hosts: 107.21.194.229
   gather_facts: no
-  become_user: root
+  remote_user: root
   tasks:
   - name: check java installation
     yum:
