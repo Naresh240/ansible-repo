@@ -1,0 +1,4 @@
+- hosts: all
+  tasks:
+  - name: print hello world
+    shell: echo "Hello Tower is Working...!!!!"
