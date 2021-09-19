@@ -1,13 +1,9 @@
 ---
 - hosts: 34.224.223.190
   tasks:
-  - name: check pwd
-    shell: pwd
-  - name: List of file
-    shell: ls -lrt
   - name: copy file from master to node2
     copy:
-      src: hello-world.yml
+      src: /home/ec2-user/test.txt
       dest: /opt/test.txt
       mode: 0644
       remote_src: true
