@@ -3,8 +3,7 @@
   tasks:
   - name: copy file from master to node2
     copy:
-      src: /root/test.txt
+      src: ./hello-world.yml
       dest: /opt/test.txt
       mode: 0644
-    remote_src: true
-    become: true
+      remote_src: true
