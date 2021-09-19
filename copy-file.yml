@@ -4,7 +4,7 @@
   - name: check pwd
     shell: echo $pwd
   - name: List of file
-    shell: ll
+    shell: ls -lrt
   - name: copy file from master to node2
     copy:
       src: hello-world.yml
