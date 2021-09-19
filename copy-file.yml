@@ -1,9 +1,13 @@
 ---
 - hosts: 34.224.223.190
   tasks:
+  - name: create example directory
+    file:
+      path: /home/ec2-user/example
+      state: directory 
   - name: copy file from master to node2
     copy:
       src: /home/ec2-user/test.txt
-      dest: /opt/test.txt
+      dest: /home/ec2-user/example/test.txt
       mode: 0644
       remote_src: true
