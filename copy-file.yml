@@ -1,6 +1,8 @@
 ---
 - hosts: 34.224.223.190
   tasks:
+  - name: check pwd
+    shell: echo $pwd
   - name: copy file from master to node2
     copy:
       src: hello-world.yml
