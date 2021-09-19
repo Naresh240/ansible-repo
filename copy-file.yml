@@ -6,3 +6,5 @@
       src: /root/test.txt
       dest: /opt/test.txt
       mode: 0644
+    remote_src: true
+    become: true
