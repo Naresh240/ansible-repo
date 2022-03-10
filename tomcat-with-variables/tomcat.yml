@@ -17,9 +17,6 @@
   - name: Print variables
     debug:
       msg: "{{ tomcat_download_url }}"
-  - name: Print variables
-    debug:
-      msg: "{{ tomcat_download_url }}"
   - name: Check Tomcat already exists or not
     stat:
       path: "{{ tomcat_download_directory }}/apache-tomcat-{{ tomcat_version }}.tar.gz"
