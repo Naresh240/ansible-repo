@@ -1,46 +1,50 @@
-- hosts: test
+---
+- hosts: localhost
   tasks:
-  - name: Check Tomcat already exists or not
+  - name: check file tomcat tar file existance
     stat:
-      path: /opt/apache-tomcat-8.5.61.tar.gz
-    register: check_tomcat_existence
-  - name: Print variables
+      path: /opt/apache-tomcat-9.0.74.zip
+    register: tomcat_file_existance
+  - name: print tomcat_file_existance variable output
     debug:
-      msg: check_tomcat_existence
-  - name: download tomcat url
+      msg: "{{ tomcat_file_existance }}"
+  - name: download tomcat zip file
     get_url:
-      url: https://mirrors.estointernet.in/apache/tomcat/tomcat-8/v8.5.61/bin/apache-tomcat-8.5.61.tar.gz
+      url: https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.74/bin/apache-tomcat-9.0.74.zip
       dest: /opt
-      mode: 0777
-    when: not check_tomcat_existence.stat.exists
-  - name: extract tomcat
+    when: not tomcat_file_existance.stat.exists
+  - name: extract zip file
     unarchive:
-      src: /opt/apache-tomcat-8.5.61.tar.gz
+      src: /opt/apache-tomcat-9.0.74.zip
       dest: /opt
-      remote_src: True
-  - name: Create Tomcat user and Group
+  - name: lookup files with a certain pattern
+    find:
+      paths: /opt/apache-tomcat-9.0.74/bin
+      file_type: file
+      patterns: "*.sh"
+    register: filelist
+  - name: change permissions
+    file:
+      path: "{{ item.path }}"
+      state: file
+      mode: "0775"
+    with_items: "{{ filelist.files }}"
+  - name: create tomcat user
     user:
       name: tomcat
       state: present
-      comment: "user for comment"
-  - name: Change directory tomcat permissions
+  - name: change ownership of tomcat home directory
     file:
-      path: /opt/apache-tomcat-8.5.61
-      state: directory
-      recurse: yes
+      path: /opt/apache-tomcat-9.0.74
       owner: tomcat
       group: tomcat
-      mode: '0755'
-  - name: tomcat service file template
-    template:
-      src: tomcat.service.j2
-      dest: ./tomcat.service
-  - name: Copy Tomcat service from local to remote
+      state: directory
+      recurse: yes
+  - name: copy file to /etc/systemd/system
     copy:
-      src: ./tomcat.service
-      dest: /etc/systemd/system/
+      src: tomcat.service
+      dest: /etc/systemd/system
       mode: 0755
-      remote_src: yes
   - name: just force systemd to reread configs (2.4 and above)
     systemd:
       daemon_reload: yes
