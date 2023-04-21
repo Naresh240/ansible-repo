@@ -1,17 +1,17 @@
 [Unit]
-Description=Apache Tomcat Web Application Container
-After=syslog.target network.target
+Description=Apache apache-tomcat-{{ tomcat_version }} Web Application Container
+After=network.target
 
 [Service]
 Type=forking
 
-Environment=JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.282.b08-1.amzn2.0.1.x86_64/jre
-Environment=CATALINA_PID={{ tomcat_download_directory }}/apache-tomcat-{{ tomcat_version }}/temp/tomcat.pid
-Environment=CATALINA_HOME={{ tomcat_download_directory }}/apache-tomcat-{{ tomcat_version }}
-Environment=CATALINA_BASE={{ tomcat_download_directory }}/apache-tomcat-{{ tomcat_version }}
+Environment=JAVA_HOME=/usr/lib/jvm/jre
+Environment=CATALINA_PID={{ tomcat_path }}/apache-tomcat-{{ tomcat_version }}/temp/apache-tomcat-{{ tomcat_version }}.pid
+Environment=CATALINA_HOME={{ tomcat_path }}/apache-tomcat-{{ tomcat_version }}
+Environment=CATALINA_BASE={{ tomcat_path }}/apache-tomcat-{{ tomcat_version }}
 Environment='CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
 Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom'
-ExecStart="{{ tomcat_download_directory }}/apache-tomcat-{{ tomcat_version }}/bin/startup.sh"
+ExecStart={{ tomcat_path }}/apache-tomcat-{{ tomcat_version }}/bin/startup.sh
 ExecStop=/bin/kill -15 $MAINPID
 
 User=tomcat
