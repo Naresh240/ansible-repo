@@ -1,62 +1,59 @@
 ---
-- hosts: installations
+- hosts: localhost
   vars:
-    tomcat_download_url: https://downloads.apache.org/tomcat/tomcat-9/v9.0.46/bin/apache-tomcat-9.0.46.tar.gz
-    tomcat_download_directory: /opt
-    tomcat_version: 9.0.46
+    tomcat_url: https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.8/bin/apache-tomcat-10.1.8.zip
+    tomcat_version: 10.1.8
+    tomcat_path: /opt
   tasks:
-  - name: Check if java rpm is already installed or not
-    yum:
-      list: java-1.8.0-openjdk
-    register: check_java_existence
-  - name : Install java
-    yum:
-      name: java-1.8.0-openjdk
-      state: present
-    when: check_java_existence.results | selectattr("yumstate", "match", "installed") | list | length == 0
-  - name: Print variables
-    debug:
-      msg: "{{ tomcat_download_url }}"
-  - name: Check Tomcat already exists or not
+  - name: check file tomcat tar file existance
     stat:
-      path: "{{ tomcat_download_directory }}/apache-tomcat-{{ tomcat_version }}.tar.gz"
-    register: check_tomcat_existence
-  - name: Print tomcat tar file exists or not
+      path: "{{ tomcat_path }}/apache-tomcat-{{ tomcat_version }}.zip"
+    register: tomcat_file_existance
+  - name: print tomcat_file_existance variable output
     debug:
-      msg: "{{ check_tomcat_existence }}"
-  - name: Download Apache Tomcat 9
+      msg: "{{ tomcat_file_existance }}"
+  - name: download tomcat zip file
     get_url:
-      url: "{{ tomcat_download_url }}"
-      dest: "{{ tomcat_download_directory }}"
-      mode: '0777'
-    when: not check_tomcat_existence.stat.exists
-  - name: unarchive Apache tomcat
+      url: "{{ tomcat_url }}"
+      dest: "{{ tomcat_path }}"
+    when: not tomcat_file_existance.stat.exists
+  - name: extract zip file
     unarchive:
-      src: "{{ tomcat_download_directory }}/apache-tomcat-{{ tomcat_version }}.tar.gz"
-      dest: "{{ tomcat_download_directory }}"
-      remote_src: yes
-  - name: Create Tomcat user and Group
+      src: "{{ tomcat_path }}/apache-tomcat-{{ tomcat_version }}.zip"
+      dest: "{{ tomcat_path }}"
+  - name: lookup files with a certain pattern
+    find:
+      paths: "{{ tomcat_path }}/apache-tomcat-{{ tomcat_version }}/bin"
+      file_type: file
+      patterns: "*.sh"
+    register: filelist
+  - name: change permissions
+    file:
+      path: "{{ item.path }}"
+      state: file
+      mode: "0775"
+    with_items: "{{ filelist.files }}"
+  - name: create tomcat user
     user:
       name: tomcat
-      comment: user for tomcat
-  - name: Change owner ship for tomcat
+      state: present
+  - name: change ownership of tomcat home directory
     file:
-      path: /opt/apache-tomcat-{{ tomcat_version }}
-      state: directory
-      recurse: yes
+      path: "{{ tomcat_path }}/apache-tomcat-{{ tomcat_version }}"
       owner: tomcat
       group: tomcat
-      mode: '0755'
-  - name : Tomcat template
+      state: directory
+      recurse: yes
+  - name: modify values with variable under service file
     template:
       src: tomcat.service.j2
-      dest: ./tomcat.service
-  - name: Copy Tomcat service from local to remote
-    copy:
-      src: ./tomcat.service
-      dest: /etc/systemd/system/
+      dest: tomcat.service
       mode: 0755
-      remote_src: yes
+  - name: copy file to /etc/systemd/system
+    copy:
+      src: tomcat.service
+      dest: /etc/systemd/system
+      mode: 0755
   - name: just force systemd to reread configs (2.4 and above)
     systemd:
       daemon_reload: yes
