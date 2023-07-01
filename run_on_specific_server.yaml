@@ -1,0 +1,6 @@
+---
+- hosts: 18.212.50.91
+  tasks:
+  - name: Task to run on 18.212.50.91
+    debug:
+      msg: This task will run on linux
