@@ -1,15 +1,15 @@
 ---
 - hosts: localhost
   vars:
-    tomcat_url: https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.8/bin/apache-tomcat-10.1.8.zip
-    tomcat_version: 10.1.8
     tomcat_path: /opt
+    tomcat_version: 10.1.19
+    tomcat_url: https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.19/bin/apache-tomcat-10.1.19.zip
   tasks:
-  - name: check file tomcat tar file existance
+  - name: check file tomcat zip file existance
     stat:
       path: "{{ tomcat_path }}/apache-tomcat-{{ tomcat_version }}.zip"
     register: tomcat_file_existance
-  - name: print tomcat_file_existance variable output
+  - name: print tomcat_file_existance
     debug:
       msg: "{{ tomcat_file_existance }}"
   - name: download tomcat zip file
@@ -21,6 +21,7 @@
     unarchive:
       src: "{{ tomcat_path }}/apache-tomcat-{{ tomcat_version }}.zip"
       dest: "{{ tomcat_path }}"
+      remote_src: yes
   - name: lookup files with a certain pattern
     find:
       paths: "{{ tomcat_path }}/apache-tomcat-{{ tomcat_version }}/bin"
@@ -47,12 +48,7 @@
   - name: modify values with variable under service file
     template:
       src: tomcat.service.j2
-      dest: tomcat.service
-      mode: 0755
-  - name: copy file to /etc/systemd/system
-    copy:
-      src: tomcat.service
-      dest: /etc/systemd/system
+      dest: /etc/systemd/system/tomcat.service
       mode: 0755
   - name: just force systemd to reread configs (2.4 and above)
     systemd:
