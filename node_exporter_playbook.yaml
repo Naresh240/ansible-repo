@@ -1,0 +1,84 @@
+---
+- name: Install and configure Node Exporter
+  hosts: localhost
+  become: true
+  vars:
+    node_exporter_version: "1.8.2"
+    node_exporter_user: "node_exporter"
+    node_exporter_group: "node_exporter"
+    node_exporter_port: "9100"
+    download_url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+    node_exporter_dir: "/opt/node_exporter"
+    node_exporter_binary_path: "/usr/bin/node_exporter"
+
+  tasks:
+
+    - name: Ensure group exists
+      group:
+        name: "{{ node_exporter_group }}"
+        state: present
+
+    - name: Ensure user exists
+      user:
+        name: "{{ node_exporter_user }}"
+        group: "{{ node_exporter_group }}"
+        shell: /bin/false
+        create_home: no
+        system: yes
+
+    - name: Create working directory
+      file:
+        path: "{{ node_exporter_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Download Node Exporter archive
+      get_url:
+        url: "{{ download_url }}"
+        dest: "/tmp/node_exporter.tar.gz"
+        mode: '0644'
+
+    - name: Extract Node Exporter
+      unarchive:
+        src: "/tmp/node_exporter.tar.gz"
+        dest: "/tmp"
+        remote_src: yes
+
+    - name: Copy node_exporter binary to /usr/bin
+      copy:
+        src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-amd64/node_exporter"
+        dest: "{{ node_exporter_binary_path }}"
+        mode: '0755'
+        owner: "{{ node_exporter_user }}"
+        group: "{{ node_exporter_group }}"
+
+    - name: Create systemd service for Node Exporter
+      copy:
+        dest: /usr/lib/systemd/system/node_exporter.service
+        content: |
+          [Unit]
+          Description=Node Exporter
+          Documentation=https://prometheus.io/docs/guides/node-exporter/
+          Wants=network-online.target
+          After=network-online.target
+
+          [Service]
+          User={{ node_exporter_user }}
+          Group={{ node_exporter_group }}
+          Type=simple
+          Restart=on-failure
+          ExecStart={{ node_exporter_binary_path }} --web.listen-address=:{{ node_exporter_port }}
+
+          [Install]
+          WantedBy=multi-user.target
+        mode: '0664'
+
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes
+
+    - name: Enable and start node_exporter service
+      systemd:
+        name: node_exporter
+        enabled: yes
+        state: started
