@@ -1,0 +1,12 @@
+---
+- hosts: remote-server
+  tasks:
+  - name: Install java17, git, maven on linux
+    yum:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+    - git
+    - maven
+    - java-17-amazon-corretto
+
